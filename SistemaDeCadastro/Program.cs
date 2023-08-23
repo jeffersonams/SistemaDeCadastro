@@ -2,8 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Refit;
 using SistemaDeCadastro.Controllers;
 using SistemaDeCadastro.Data;
+using SistemaDeCadastro.Integracao;
+using SistemaDeCadastro.Integracao.Interfaces;
+using SistemaDeCadastro.Integracao.Refit;
 using SistemaDeCadastro.Repositorio;
 using SistemaDeCadastro.Repositorio.Interfaces;
 
@@ -24,6 +28,12 @@ namespace SistemaDeCadastro
 
             builder.Services.AddEntityFrameworkSqlServer().AddDbContext<CadastroDBContext>(O => O.UseSqlServer(builder.Configuration.GetConnectionString("DataBase")));
             builder.Services.AddScoped<ICadastroRepositorio, CadastroRepositorio>();
+            builder.Services.AddScoped<IViaCepIntegracao, ViaCepIntegracao>();
+
+            builder.Services.AddRefitClient<IViaCepIntegracaoRefit>().ConfigureHttpClient(c =>
+            {
+                c.BaseAddress = new Uri("https://viacep.com.br");
+            });
 
 
             var app = builder.Build();
